@@ -344,4 +344,127 @@ More text.
 			}
 		})
 	})
+
+	describe("PBT status tracking", () => {
+		it("should parse PBT status metadata", () => {
+			const content = `- [ ] 1 Write property test
+  _PBT: status=passed_
+- [ ] 2 Another test
+  _PBT: status=failed, failingExample="counterexample: x=5"_
+`
+
+			const taskTree = parser.parseContent(content)
+
+			expect(taskTree.tasks[0].pbtStatus).to.not.be.undefined
+			expect(taskTree.tasks[0].pbtStatus?.status).to.equal("passed")
+			expect(taskTree.tasks[0].pbtStatus?.failingExample).to.be.undefined
+
+			expect(taskTree.tasks[1].pbtStatus).to.not.be.undefined
+			expect(taskTree.tasks[1].pbtStatus?.status).to.equal("failed")
+			expect(taskTree.tasks[1].pbtStatus?.failingExample).to.equal("counterexample: x=5")
+		})
+
+		it("should parse all PBT status types", () => {
+			const content = `- [ ] 1 Test passed
+  _PBT: status=passed_
+- [ ] 2 Test failed
+  _PBT: status=failed_
+- [ ] 3 Test not run
+  _PBT: status=not_run_
+- [ ] 4 Test unexpected pass
+  _PBT: status=unexpected_pass_
+`
+
+			const taskTree = parser.parseContent(content)
+
+			expect(taskTree.tasks[0].pbtStatus?.status).to.equal("passed")
+			expect(taskTree.tasks[1].pbtStatus?.status).to.equal("failed")
+			expect(taskTree.tasks[2].pbtStatus?.status).to.equal("not_run")
+			expect(taskTree.tasks[3].pbtStatus?.status).to.equal("unexpected_pass")
+		})
+
+		it("should handle PBT status with nested tasks", () => {
+			const content = `- [ ] 1 Parent task
+  _PBT: status=passed_
+  - [ ] 1.1 Child task
+    _PBT: status=failed, failingExample="error"_
+`
+
+			const taskTree = parser.parseContent(content)
+
+			expect(taskTree.tasks[0].pbtStatus?.status).to.equal("passed")
+			expect(taskTree.tasks[0].subTasks[0].pbtStatus?.status).to.equal("failed")
+			expect(taskTree.tasks[0].subTasks[0].pbtStatus?.failingExample).to.equal("error")
+		})
+
+		it("should pretty print PBT status metadata", () => {
+			const content = `- [ ] 1 Write property test
+  _PBT: status=passed_
+- [ ] 2 Another test
+  _PBT: status=failed, failingExample="counterexample: x=5"_
+`
+
+			const taskTree = parser.parseContent(content)
+			const output = parser.prettyPrint(taskTree)
+
+			expect(output).to.include("- [ ] 1 Write property test")
+			expect(output).to.include("  _PBT: status=passed_")
+			expect(output).to.include("- [ ] 2 Another test")
+			expect(output).to.include('  _PBT: status=failed, failingExample="counterexample: x=5"_')
+		})
+
+		it("should preserve PBT status through round-trip", () => {
+			const content = `- [ ] 1 Write property test
+  _PBT: status=passed_
+- [ ] 2 Another test
+  _PBT: status=failed, failingExample="counterexample: x=5"_
+- [ ] 3 Nested test
+  - [ ] 3.1 Sub-test
+    _PBT: status=unexpected_pass_
+`
+
+			const taskTree1 = parser.parseContent(content)
+			const printed = parser.prettyPrint(taskTree1)
+			const taskTree2 = parser.parseContent(printed)
+
+			const allTasks1 = taskTree1.getAllTasks()
+			const allTasks2 = taskTree2.getAllTasks()
+
+			expect(allTasks2).to.have.lengthOf(allTasks1.length)
+
+			for (let i = 0; i < allTasks1.length; i++) {
+				if (allTasks1[i].pbtStatus) {
+					expect(allTasks2[i].pbtStatus).to.not.be.undefined
+					expect(allTasks2[i].pbtStatus?.status).to.equal(allTasks1[i].pbtStatus?.status)
+					expect(allTasks2[i].pbtStatus?.failingExample).to.equal(allTasks1[i].pbtStatus?.failingExample)
+				} else {
+					expect(allTasks2[i].pbtStatus).to.be.undefined
+				}
+			}
+		})
+
+		it("should handle escaped quotes in failing examples", () => {
+			const content = `- [ ] 1 Test with quotes
+  _PBT: status=failed, failingExample="error: \\"quoted text\\""_
+`
+
+			const taskTree = parser.parseContent(content)
+
+			expect(taskTree.tasks[0].pbtStatus?.failingExample).to.equal('error: "quoted text"')
+		})
+
+		it("should handle tasks without PBT status", () => {
+			const content = `- [ ] 1 Regular task without PBT
+- [ ] 2 Task with PBT
+  _PBT: status=passed_
+- [ ] 3 Another regular task
+`
+
+			const taskTree = parser.parseContent(content)
+
+			expect(taskTree.tasks[0].pbtStatus).to.be.undefined
+			expect(taskTree.tasks[1].pbtStatus).to.not.be.undefined
+			expect(taskTree.tasks[2].pbtStatus).to.be.undefined
+		})
+	})
 })

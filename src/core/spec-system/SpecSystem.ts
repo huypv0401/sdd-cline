@@ -12,6 +12,7 @@ import * as path from "path"
 import * as fs from "fs"
 import { ConfigManager } from "./ConfigManager"
 import { WorkflowController } from "./WorkflowController"
+import { SpecPreviewProvider } from "./SpecPreviewProvider"
 import type { Controller } from "../controller"
 
 /**
@@ -20,13 +21,22 @@ import type { Controller } from "../controller"
 export class SpecSystem {
 	private configManager: ConfigManager
 	private workflowController: WorkflowController
+	private previewProvider: SpecPreviewProvider
 
 	constructor(
 		private context: vscode.ExtensionContext,
-		private controller?: Controller,
+		private controller: Controller,
 	) {
 		this.configManager = new ConfigManager()
 		this.workflowController = new WorkflowController(context, controller)
+		this.previewProvider = new SpecPreviewProvider(context, controller)
+	}
+
+	/**
+	 * Get the preview provider instance
+	 */
+	getPreviewProvider(): SpecPreviewProvider {
+		return this.previewProvider
 	}
 
 	/**
@@ -98,12 +108,8 @@ export class SpecSystem {
 				return
 			}
 
-			// TODO: Show preview using SpecPreviewProvider
-			// This will be implemented when SpecPreviewProvider is created
-			// await this.previewProvider.show(specName)
-			vscode.window.showInformationMessage(
-				`Opening preview for spec "${specName}" will be implemented in SpecPreviewProvider`,
-			)
+			// Show preview using SpecPreviewProvider
+			await this.previewProvider.show(specName)
 		} catch (error) {
 			vscode.window.showErrorMessage(
 				`Failed to open spec preview: ${error instanceof Error ? error.message : String(error)}`,

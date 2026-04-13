@@ -15,6 +15,12 @@ export { RequirementsParser } from "./RequirementsParser"
 export { TasksParser } from "./TasksParser"
 // Export WorkflowController
 export { WorkflowController } from "./WorkflowController"
+// Export TaskExecutor
+export { TaskExecutor } from "./TaskExecutor"
+// Export TaskOrchestrator
+export { TaskOrchestrator } from "./TaskOrchestrator"
+// Export SpecPreviewProvider
+export { SpecPreviewProvider } from "./SpecPreviewProvider"
 // Export all core types
 export * from "./types"
 

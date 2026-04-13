@@ -238,6 +238,17 @@ export type ExtensionToWebviewMessage =
 			progress: number
 			message: string
 	  }
+	| {
+			type: "taskExecutionStarted"
+			taskId: string
+	  }
+	| {
+			type: "allTasksExecutionStarted"
+	  }
+	| {
+			type: "restoreScroll"
+			position: number
+	  }
 
 /**
  * Messages sent from webview to extension
@@ -259,6 +270,11 @@ export type WebviewToExtensionMessage =
 	  }
 	| {
 			type: "refreshContent"
+	  }
+	| {
+			type: "saveScroll"
+			tab: string
+			position: number
 	  }
 
 // ============================================================================

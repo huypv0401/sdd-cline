@@ -34,9 +34,22 @@ export class TasksParser {
 		const rootTasks: Task[] = []
 		const taskStack: Task[] = []
 		let lineNumber = 0
+		let currentTask: Task | null = null
 
 		for (const line of lines) {
 			lineNumber++
+
+			// Check for PBT metadata line (must come after a task line)
+			// Format: _PBT: status=passed|failed|not_run|unexpected_pass, failingExample="..."_
+			const pbtMatch = line.match(/^\s*_PBT:\s*status=(passed|failed|not_run|unexpected_pass)(?:,\s*failingExample="([^"]*)")?_/)
+			if (pbtMatch && currentTask) {
+				const [, status, failingExample] = pbtMatch
+				currentTask.pbtStatus = {
+					status: status as "passed" | "failed" | "not_run" | "unexpected_pass",
+					failingExample: failingExample || undefined,
+				}
+				continue
+			}
 
 			// Match task line: - [status] taskId description
 			// Pattern: optional whitespace, dash, space, [status char], optional *, space, task ID (with optional period), space, description
@@ -44,6 +57,7 @@ export class TasksParser {
 			const match = line.match(/^(\s*)- \[(.)\]\*?\s+([\d.]+)\.?\s+(.+)$/)
 			if (!match) {
 				// Skip non-task lines (headers, empty lines, etc.)
+				currentTask = null
 				continue
 			}
 
@@ -86,6 +100,7 @@ export class TasksParser {
 			}
 
 			taskStack.push(task)
+			currentTask = task
 		}
 
 		return new TaskTree(rootTasks)
@@ -107,6 +122,19 @@ export class TasksParser {
 			const indentStr = "  ".repeat(indent)
 			const statusChar = this.formatStatus(task.status)
 			output += `${indentStr}- [${statusChar}] ${task.id} ${task.description}\n`
+
+			// Add PBT status metadata if present
+			if (task.pbtStatus) {
+				const pbtIndentStr = "  ".repeat(indent + 1)
+				let pbtLine = `${pbtIndentStr}_PBT: status=${task.pbtStatus.status}`
+				if (task.pbtStatus.failingExample) {
+					// Escape quotes in failing example
+					const escapedExample = task.pbtStatus.failingExample.replace(/"/g, '\\"')
+					pbtLine += `, failingExample="${escapedExample}"`
+				}
+				pbtLine += "_\n"
+				output += pbtLine
+			}
 
 			for (const subTask of task.subTasks) {
 				printTask(subTask, indent + 1)
