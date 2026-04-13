@@ -13,6 +13,8 @@ export { ConfigManager } from "./ConfigManager"
 export { RequirementsParser } from "./RequirementsParser"
 // Export TasksParser
 export { TasksParser } from "./TasksParser"
+// Export WorkflowController
+export { WorkflowController } from "./WorkflowController"
 // Export all core types
 export * from "./types"
 

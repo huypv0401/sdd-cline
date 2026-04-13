@@ -165,39 +165,39 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - _Requirements: 1.5, 1.4_
 
 - [x] 7. Implement WorkflowController
-  - [~] 7.1 Create WorkflowController class
+  - [x] 7.1 Create WorkflowController class
     - Initialize with VSCode extension context
     - Set up Cline Controller integration
     - Initialize parsers
     - _Requirements: 2.1, 11.2_
   
-  - [~] 7.2 Implement spec directory creation
+  - [x] 7.2 Implement spec directory creation
     - Write createSpecDirectory() method
     - Create .sddcline/{spec-name}/ directory structure
     - Check .clineignore rules
     - _Requirements: 1.1, 11.6_
   
-  - [~] 7.3 Implement config file creation
+  - [x] 7.3 Implement config file creation
     - Write createConfigFile() method
     - Generate unique specId with UUID
     - Set workflowType and specType
     - Add creation timestamp
     - _Requirements: 1.2, 16.1, 16.2, 16.3, 16.4_
   
-  - [~] 7.4 Implement requirements generation
+  - [x] 7.4 Implement requirements generation
     - Write generateRequirements() method
     - Use Cline Controller to generate requirements
     - Apply EARS patterns and INCOSE rules
     - Save to requirements.md
     - _Requirements: 2.2, 2.7, 2.8_
   
-  - [~] 7.5 Implement design generation
+  - [x] 7.5 Implement design generation
     - Write generateDesign() method
     - Use Cline Controller to generate design
     - Save to design.md
     - _Requirements: 3.2_
   
-  - [~] 7.6 Implement tasks generation
+  - [x] 7.6 Implement tasks generation
     - Write generateTasks() method
     - Convert design to implementation tasks
     - Create task hierarchy with proper IDs
@@ -205,13 +205,13 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Save to tasks.md
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
   
-  - [~] 7.7 Implement user approval workflow
+  - [x] 7.7 Implement user approval workflow
     - Write waitForApproval() method
     - Show notification with Approve/Modify buttons
     - Handle modification requests
     - _Requirements: 2.3, 2.4, 3.3, 3.4, 4.5, 4.6, 15.7_
   
-  - [~] 7.8 Implement requirements-first workflow
+  - [x] 7.8 Implement requirements-first workflow
     - Write initRequirementsFirst() method
     - Create spec directory and config
     - Generate requirements → wait for approval
@@ -219,7 +219,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Generate tasks
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
   
-  - [~] 7.9 Implement design-first workflow
+  - [x] 7.9 Implement design-first workflow
     - Write initDesignFirst() method
     - Create spec directory and config
     - Generate design → wait for approval
@@ -232,10 +232,10 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test workflow routing
     - _Requirements: 1.1, 1.2, 2.1, 3.1_
 
-- [~] 8. Checkpoint - Ensure workflow controller tests pass
+- [x] 8. Checkpoint - Ensure workflow controller tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 9. Implement TaskExecutor
+- [-] 9. Implement TaskExecutor
   - [~] 9.1 Create TaskExecutor class
     - Initialize with Cline Controller
     - _Requirements: 10.1, 11.3_

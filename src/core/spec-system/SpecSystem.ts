@@ -11,15 +11,22 @@ import * as vscode from "vscode"
 import * as path from "path"
 import * as fs from "fs"
 import { ConfigManager } from "./ConfigManager"
+import { WorkflowController } from "./WorkflowController"
+import type { Controller } from "../controller"
 
 /**
  * Main entry point for the Spec System
  */
 export class SpecSystem {
 	private configManager: ConfigManager
+	private workflowController: WorkflowController
 
-	constructor(private context: vscode.ExtensionContext) {
+	constructor(
+		private context: vscode.ExtensionContext,
+		private controller?: Controller,
+	) {
 		this.configManager = new ConfigManager()
+		this.workflowController = new WorkflowController(context, controller)
 	}
 
 	/**
@@ -64,18 +71,11 @@ export class SpecSystem {
 				async (progress) => {
 					progress.report({ increment: 0, message: "Initializing..." })
 
-					// TODO: Initialize workflow based on type
-					// This will be implemented when WorkflowController is created
+					// Initialize workflow based on type
 					if (workflowType === "requirements-first") {
-						// await this.workflowController.initRequirementsFirst(specName)
-						vscode.window.showInformationMessage(
-							`Requirements-first workflow for "${specName}" will be implemented in WorkflowController`,
-						)
+						await this.workflowController.initRequirementsFirst(specName)
 					} else {
-						// await this.workflowController.initDesignFirst(specName)
-						vscode.window.showInformationMessage(
-							`Design-first workflow for "${specName}" will be implemented in WorkflowController`,
-						)
+						await this.workflowController.initDesignFirst(specName)
 					}
 
 					progress.report({ increment: 100, message: "Complete" })

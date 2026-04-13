@@ -5,11 +5,20 @@
  * Validates: Requirements 1.4, 1.5
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import * as vscode from "vscode"
 import * as fs from "fs"
 import * as path from "path"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import * as vscode from "vscode"
 import { SpecSystem } from "../SpecSystem"
+
+// Helper type for accessing private methods in tests
+type SpecSystemPrivate = {
+	validateSpecName: (name: string) => boolean
+	specExists: (specName: string) => Promise<boolean>
+	extractSpecName: (filePath: string) => string | undefined
+	promptWorkflowType: () => Promise<"requirements-first" | "design-first" | undefined>
+	promptSpecName: () => Promise<string | undefined>
+}
 
 // Mock vscode module
 vi.mock("vscode", () => ({
@@ -40,6 +49,7 @@ describe("SpecSystem", () => {
 
 	beforeEach(() => {
 		// Create mock extension context
+		// biome-ignore lint/suspicious/noExplicitAny: Test mocking requires any for VSCode types
 		mockContext = {
 			subscriptions: [],
 			workspaceState: {
@@ -204,9 +214,7 @@ describe("SpecSystem", () => {
 
 			await specSystem.createNewSpec()
 
-			expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-				expect.stringContaining("Invalid spec name"),
-			)
+			expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining("Invalid spec name"))
 		})
 
 		it("should show error if spec already exists", async () => {
@@ -242,7 +250,7 @@ describe("SpecSystem", () => {
 			vi.mocked(vscode.window.showQuickPick).mockResolvedValue({
 				label: "Requirements-First",
 				value: "requirements-first",
-			} as any)
+			} as vscode.QuickPickItem & { value: "requirements-first" })
 
 			// Mock user cancelling spec name input
 			vi.mocked(vscode.window.showInputBox).mockResolvedValue(undefined)
@@ -258,9 +266,7 @@ describe("SpecSystem", () => {
 		it("should show error if spec name cannot be extracted", async () => {
 			await specSystem.openSpecPreview("/invalid/path/file.md")
 
-			expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-				"Could not determine spec name from file path",
-			)
+			expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Could not determine spec name from file path")
 		})
 
 		it("should show info message for valid spec path", async () => {
@@ -277,9 +283,9 @@ describe("SpecSystem", () => {
 			vi.mocked(vscode.window.showQuickPick).mockResolvedValue({
 				label: "Requirements-First",
 				value: "requirements-first",
-			} as any)
+			} as vscode.QuickPickItem & { value: "requirements-first" })
 
-			const result = await (specSystem as any).promptWorkflowType()
+			const result = await (specSystem as unknown as SpecSystemPrivate).promptWorkflowType()
 
 			expect(result).toBe("requirements-first")
 		})
@@ -288,9 +294,9 @@ describe("SpecSystem", () => {
 			vi.mocked(vscode.window.showQuickPick).mockResolvedValue({
 				label: "Design-First",
 				value: "design-first",
-			} as any)
+			} as vscode.QuickPickItem & { value: "design-first" })
 
-			const result = await (specSystem as any).promptWorkflowType()
+			const result = await (specSystem as unknown as SpecSystemPrivate).promptWorkflowType()
 
 			expect(result).toBe("design-first")
 		})
@@ -298,7 +304,7 @@ describe("SpecSystem", () => {
 		it("should return undefined when cancelled", async () => {
 			vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined)
 
-			const result = await (specSystem as any).promptWorkflowType()
+			const result = await (specSystem as unknown as SpecSystemPrivate).promptWorkflowType()
 
 			expect(result).toBeUndefined()
 		})
@@ -308,7 +314,7 @@ describe("SpecSystem", () => {
 		it("should return valid spec name", async () => {
 			vi.mocked(vscode.window.showInputBox).mockResolvedValue("my-feature")
 
-			const result = await (specSystem as any).promptSpecName()
+			const result = await (specSystem as unknown as SpecSystemPrivate).promptSpecName()
 
 			expect(result).toBe("my-feature")
 		})
@@ -316,7 +322,7 @@ describe("SpecSystem", () => {
 		it("should return undefined when cancelled", async () => {
 			vi.mocked(vscode.window.showInputBox).mockResolvedValue(undefined)
 
-			const result = await (specSystem as any).promptSpecName()
+			const result = await (specSystem as unknown as SpecSystemPrivate).promptSpecName()
 
 			expect(result).toBeUndefined()
 		})
@@ -324,12 +330,12 @@ describe("SpecSystem", () => {
 		it("should validate input in real-time", async () => {
 			let validateInput: ((value: string) => string | null) | undefined
 
-			vi.mocked(vscode.window.showInputBox).mockImplementation((options: any) => {
-				validateInput = options.validateInput
+			vi.mocked(vscode.window.showInputBox).mockImplementation((options: vscode.InputBoxOptions | undefined) => {
+				validateInput = options?.validateInput
 				return Promise.resolve("my-feature")
 			})
 
-			await (specSystem as any).promptSpecName()
+			await (specSystem as unknown as SpecSystemPrivate).promptSpecName()
 
 			expect(validateInput).toBeDefined()
 
