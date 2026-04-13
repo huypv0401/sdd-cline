@@ -5,6 +5,8 @@
  * enabling structured development through requirements, design, and task documents.
  */
 
+// Export ConfigManager
+export { ConfigManager } from "./ConfigManager"
 // Export all core types
 export * from "./types"
 

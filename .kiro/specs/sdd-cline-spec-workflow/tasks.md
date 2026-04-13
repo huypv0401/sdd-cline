@@ -13,19 +13,19 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
   - _Requirements: 1.1, 1.2, 1.3, 16.1_
 
 - [ ] 2. Implement ConfigManager
-  - [-] 2.1 Implement config file creation and loading
+  - [x] 2.1 Implement config file creation and loading
     - Write createConfig() method to generate .config.kiro files
     - Write loadConfig() method to read and parse config files
     - Implement UUID generation for specId
     - _Requirements: 16.1, 16.2, 16.3, 16.4_
   
-  - [~] 2.2 Implement config validation
+  - [x] 2.2 Implement config validation
     - Write validateConfig() method to check config format
     - Validate workflowType and specType enums
     - Handle missing or invalid config files
     - _Requirements: 16.6, 16.7_
   
-  - [~] 2.3 Implement config update functionality
+  - [x] 2.3 Implement config update functionality
     - Write updateConfig() method to modify existing configs
     - Update lastModified timestamp on changes
     - _Requirements: 16.5_
@@ -37,7 +37,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - _Requirements: 16.1, 16.6_
 
 - [ ] 3. Implement RequirementsParser
-  - [~] 3.1 Implement requirements document parsing
+  - [-] 3.1 Implement requirements document parsing
     - Write parse() method to extract requirements from markdown
     - Parse requirement IDs, user stories, and acceptance criteria
     - Build Requirement objects with proper structure
