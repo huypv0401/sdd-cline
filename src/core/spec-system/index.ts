@@ -21,6 +21,14 @@ export { TaskExecutor } from "./TaskExecutor"
 export { TaskOrchestrator } from "./TaskOrchestrator"
 // Export SpecPreviewProvider
 export { SpecPreviewProvider } from "./SpecPreviewProvider"
+// Export error handlers
+export { FileSystemErrorHandler } from "./FileSystemErrorHandler"
+export { ParsingErrorHandler } from "./ParsingErrorHandler"
+export { TaskExecutionErrorHandler } from "./TaskExecutionErrorHandler"
+export { ValidationErrorHandler } from "./ValidationErrorHandler"
+export { BackupManager } from "./BackupManager"
+export { StatePersistence } from "./StatePersistence"
+export { ErrorLogger } from "./ErrorLogger"
 // Export all core types
 export * from "./types"
 

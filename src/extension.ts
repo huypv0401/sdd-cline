@@ -14,7 +14,7 @@ import { sendWorktreesButtonClickedEvent } from "./core/controller/ui/subscribeT
 import { WebviewProvider } from "./core/webview"
 import { createClineAPI } from "./exports"
 import { initializeTestMode } from "./services/test/TestMode"
-import "./utils/path" // necessary to have access to String.prototype.toPosix
+import "./utils/path"; // necessary to have access to String.prototype.toPosix
 import path from "node:path"
 import type { ExtensionContext } from "vscode"
 import { HostProvider } from "@/hosts/host-provider"
@@ -30,20 +30,20 @@ import { sendAddToInputEvent } from "./core/controller/ui/subscribeToAddToInput"
 import { sendShowWebviewEvent } from "./core/controller/ui/subscribeToShowWebview"
 import { HookDiscoveryCache } from "./core/hooks/HookDiscoveryCache"
 import {
-	cleanupMcpMarketplaceCatalogFromGlobalState,
-	cleanupOldApiKey,
-	migrateCustomInstructionsToGlobalRules,
-	migrateTaskHistoryToFile,
-	migrateWelcomeViewCompleted,
-	migrateWorkspaceToGlobalStorage,
+    cleanupMcpMarketplaceCatalogFromGlobalState,
+    cleanupOldApiKey,
+    migrateCustomInstructionsToGlobalRules,
+    migrateTaskHistoryToFile,
+    migrateWelcomeViewCompleted,
+    migrateWorkspaceToGlobalStorage,
 } from "./core/storage/state-migrations"
 import { workspaceResolver } from "./core/workspace"
 import { findMatchingNotebookCell, getContextForCommand, showWebview } from "./hosts/vscode/commandUtils"
 import { abortCommitGeneration, generateCommitMsg } from "./hosts/vscode/commit-message-generator"
 import { registerClineOutputChannel } from "./hosts/vscode/hostbridge/env/debugLog"
 import {
-	disposeVscodeCommentReviewController,
-	getVscodeCommentReviewController,
+    disposeVscodeCommentReviewController,
+    getVscodeCommentReviewController,
 } from "./hosts/vscode/review/VscodeCommentReviewController"
 import { VscodeTerminalManager } from "./hosts/vscode/terminal/VscodeTerminalManager"
 import { VscodeDiffViewProvider } from "./hosts/vscode/VscodeDiffViewProvider"
@@ -119,6 +119,21 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.window.registerWebviewViewProvider(VscodeWebviewProvider.SIDEBAR_ID, webview, {
 			webviewOptions: { retainContextWhenHidden: true },
 		}),
+	)
+
+	// Initialize Spec System
+	const specSystem = new SpecSystem(context, webview.controller)
+	const specPreviewProvider = specSystem.getPreviewProvider()
+	
+	// Register Spec Preview Provider
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(
+			ExtensionRegistryInfo.views.SpecPreview,
+			specPreviewProvider as any,
+			{
+				webviewOptions: { retainContextWhenHidden: true },
+			}
+		)
 	)
 
 	// NOTE: Commands must be added to the internal registry before registering them with VSCode
@@ -501,6 +516,26 @@ ${ctx.cellJson || "{}"}
 		vscode.commands.registerCommand(commands.Walkthrough, async () => {
 			await vscode.commands.executeCommand("workbench.action.openWalkthrough", `${context.extension.id}#ClineWalkthrough`)
 			telemetryService.captureButtonClick("command_openWalkthrough")
+		}),
+	)
+
+	// Register Spec System command handlers
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.CreateNewSpec, async () => {
+			await specSystem.createNewSpec()
+			telemetryService.captureButtonClick("command_createNewSpec")
+		}),
+	)
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand(commands.OpenSpecPreview, async (uri?: vscode.Uri) => {
+			const filePath = uri?.fsPath || vscode.window.activeTextEditor?.document.uri.fsPath
+			if (filePath) {
+				await specSystem.openSpecPreview(filePath)
+				telemetryService.captureButtonClick("command_openSpecPreview")
+			} else {
+				vscode.window.showErrorMessage("No file selected to preview")
+			}
 		}),
 	)
 

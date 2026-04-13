@@ -30,6 +30,9 @@ const ClineCommands = {
 	JupyterGenerateCell: prefix + ".jupyterGenerateCell",
 	JupyterExplainCell: prefix + ".jupyterExplainCell",
 	JupyterImproveCell: prefix + ".jupyterImproveCell",
+	// Spec System commands
+	CreateNewSpec: prefix + ".createNewSpec",
+	OpenSpecPreview: prefix + ".openSpecPreview",
 }
 
 /**
@@ -38,6 +41,7 @@ const ClineCommands = {
  */
 const ClineViewIds = {
 	Sidebar: name + ".SidebarProvider",
+	SpecPreview: name + ".SpecPreviewProvider",
 }
 
 /**

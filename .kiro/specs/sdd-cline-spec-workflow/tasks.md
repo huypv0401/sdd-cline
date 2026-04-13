@@ -414,7 +414,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test status updates
     - _Requirements: 6.1, 6.2, 6.6_
 
-- [~] 15. Implement error handling
+- [x] 15. Implement error handling
   - [~] 15.1 Create FileSystemErrorHandler
     - Handle ENOENT, EACCES, ENOSPC errors
     - Show user-friendly error messages
@@ -462,37 +462,37 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test backup and restore
     - _Requirements: 17.1, 17.2, 17.3_
 
-- [~] 16. Implement VSCode extension integration
-  - [~] 16.1 Register commands in package.json
+- [x] 16. Implement VSCode extension integration
+  - [x] 16.1 Register commands in package.json
     - Add sddcline.createNewSpec command
     - Add sddcline.openSpecPreview command
     - Add sddcline.executeTask command
     - Add sddcline.executeAllTasks command
     - _Requirements: 15.1, 18.1_
   
-  - [~] 16.2 Register webview view provider
+  - [x] 16.2 Register webview view provider
     - Add viewsContainers in package.json
     - Add views configuration
     - Register SpecPreviewProvider
     - _Requirements: 18.3_
   
-  - [~] 16.3 Register file associations
+  - [x] 16.3 Register file associations
     - Associate .md files in .sddcline/ directory
     - Add custom language ID
     - _Requirements: 18.1, 18.4_
   
-  - [~] 16.4 Add context menu items
+  - [x] 16.4 Add context menu items
     - Add "Open Spec Preview" to explorer context menu
     - Filter by .sddcline/ path
     - _Requirements: 18.2_
   
-  - [~] 16.5 Implement extension activation
+  - [x] 16.5 Implement extension activation
     - Initialize SpecSystem in activate()
     - Register all commands
     - Register file watchers
     - _Requirements: 11.1_
   
-  - [~] 16.6 Add keyboard shortcuts
+  - [x] 16.6 Add keyboard shortcuts
     - Define keybindings for common operations
     - _Requirements: 18.6_
   

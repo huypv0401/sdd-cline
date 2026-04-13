@@ -129,6 +129,15 @@
 					"name": "",
 					"icon": "assets/icons/icon.svg"
 				}
+			],
+			"explorer": [
+				{
+					"type": "webview",
+					"id": "claude-dev.SpecPreviewProvider",
+					"name": "Spec Preview",
+					"when": "resourcePath =~ /\\.sddcline\\//",
+					"contextualTitle": "Spec Preview"
+				}
 			]
 		},
 		"commands": [
@@ -235,6 +244,16 @@
 				"category": "Cline"
 			},
 			{
+				"command": "cline.createNewSpec",
+				"title": "Create New Spec",
+				"category": "Cline"
+			},
+			{
+				"command": "cline.openSpecPreview",
+				"title": "Open Spec Preview",
+				"category": "Cline"
+			},
+			{
 				"command": "cline.reviewComment.reply",
 				"title": "Reply",
 				"category": "Cline",
@@ -272,6 +291,21 @@
 				"win": "ctrl+'",
 				"linux": "ctrl+'",
 				"when": "!editorHasSelection"
+			},
+			{
+				"command": "cline.createNewSpec",
+				"key": "cmd+shift+s",
+				"mac": "cmd+shift+s",
+				"win": "ctrl+shift+s",
+				"linux": "ctrl+shift+s"
+			},
+			{
+				"command": "cline.openSpecPreview",
+				"key": "cmd+k cmd+s",
+				"mac": "cmd+k cmd+s",
+				"win": "ctrl+k ctrl+s",
+				"linux": "ctrl+k ctrl+s",
+				"when": "resourcePath =~ /\\.sddcline\\//"
 			}
 		],
 		"menus": {
@@ -307,6 +341,13 @@
 					"command": "cline.addToChat",
 					"group": "navigation",
 					"when": "editorHasSelection"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "cline.openSpecPreview",
+					"group": "navigation",
+					"when": "resourcePath =~ /\\.sddcline\\/.*\\.md$/"
 				}
 			],
 			"terminal/context": [
