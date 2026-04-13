@@ -43,7 +43,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Build Requirement objects with proper structure
     - _Requirements: 12.1, 13.1, 13.2_
   
-  - [-] 3.2 Implement EARS pattern detection
+  - [x] 3.2 Implement EARS pattern detection
     - Write detectEARSPattern() method
     - Identify WHEN/THEN for event-driven patterns
     - Identify WHILE for state-driven patterns
@@ -52,7 +52,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Identify THE for ubiquitous patterns
     - _Requirements: 2.7, 13.3_
   
-  - [~] 3.3 Implement requirements pretty printer
+  - [x] 3.3 Implement requirements pretty printer
     - Write prettyPrint() method to format Requirements to markdown
     - Preserve markdown structure and formatting
     - Maintain requirement numbering and hierarchy
@@ -77,7 +77,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - _Requirements: 12.1, 13.3, 13.6_
 
 - [ ] 4. Implement TasksParser
-  - [~] 4.1 Implement tasks document parsing
+  - [x] 4.1 Implement tasks document parsing
     - Write parse() method to extract tasks from markdown
     - Parse task IDs, descriptions, and status markers
     - Build task hierarchy based on indentation

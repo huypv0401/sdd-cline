@@ -9,6 +9,8 @@
 export { ConfigManager } from "./ConfigManager"
 // Export RequirementsParser
 export { RequirementsParser } from "./RequirementsParser"
+// Export TasksParser
+export { TasksParser } from "./TasksParser"
 // Export all core types
 export * from "./types"
 
