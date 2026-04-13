@@ -5,6 +5,8 @@
  * enabling structured development through requirements, design, and task documents.
  */
 
+// Export SpecSystem
+export { SpecSystem } from "./SpecSystem"
 // Export ConfigManager
 export { ConfigManager } from "./ConfigManager"
 // Export RequirementsParser

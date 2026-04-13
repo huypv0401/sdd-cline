@@ -12,7 +12,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
   - Set up testing framework with fast-check for property-based testing
   - _Requirements: 1.1, 1.2, 1.3, 16.1_
 
-- [ ] 2. Implement ConfigManager
+- [x] 2. Implement ConfigManager
   - [x] 2.1 Implement config file creation and loading
     - Write createConfig() method to generate .config.kiro files
     - Write loadConfig() method to read and parse config files
@@ -36,7 +36,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test config update operations
     - _Requirements: 16.1, 16.6_
 
-- [ ] 3. Implement RequirementsParser
+- [x] 3. Implement RequirementsParser
   - [x] 3.1 Implement requirements document parsing
     - Write parse() method to extract requirements from markdown
     - Parse requirement IDs, user stories, and acceptance criteria
@@ -76,7 +76,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test error handling with line numbers
     - _Requirements: 12.1, 13.3, 13.6_
 
-- [ ] 4. Implement TasksParser
+- [x] 4. Implement TasksParser
   - [x] 4.1 Implement tasks document parsing
     - Write parse() method to extract tasks from markdown
     - Parse task IDs, descriptions, and status markers
@@ -84,19 +84,19 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Track parent-child relationships
     - _Requirements: 12.3, 14.1, 14.2, 14.3_
   
-  - [~] 4.2 Implement status marker parsing
+  - [x] 4.2 Implement status marker parsing
     - Parse [ ] as NOT_STARTED
     - Parse [~] as IN_PROGRESS
     - Parse [x] as COMPLETED
     - Parse [-] as FAILED
     - _Requirements: 14.6_
   
-  - [~] 4.3 Implement TaskTree helper methods
+  - [x] 4.3 Implement TaskTree helper methods
     - Write getAllTasks() to get depth-first task list
     - Write findTask() to locate task by ID
     - _Requirements: 7.2, 8.7_
   
-  - [~] 4.4 Implement tasks pretty printer
+  - [x] 4.4 Implement tasks pretty printer
     - Write prettyPrint() method to format TaskTree to markdown
     - Preserve task hierarchy with correct indentation
     - Format status markers correctly
@@ -127,32 +127,32 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test error handling with line numbers
     - _Requirements: 12.3, 14.1, 14.6_
 
-- [~] 5. Checkpoint - Ensure all parser tests pass
+- [x] 5. Checkpoint - Ensure all parser tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Implement SpecSystem entry point
-  - [~] 6.1 Create SpecSystem class
+- [x] 6. Implement SpecSystem entry point
+  - [x] 6.1 Create SpecSystem class
     - Initialize WorkflowController, ConfigManager, and SpecPreviewProvider
     - Implement createNewSpec() method
     - Implement openSpecPreview() method
     - _Requirements: 1.1, 15.1, 15.5_
   
-  - [~] 6.2 Implement spec name validation
+  - [x] 6.2 Implement spec name validation
     - Write validateSpecName() to check kebab-case format
     - Use regex pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
     - _Requirements: 1.5_
   
-  - [~] 6.3 Implement spec existence check
+  - [x] 6.3 Implement spec existence check
     - Write specExists() to check if spec directory exists
     - Prevent duplicate spec creation
     - _Requirements: 1.4_
   
-  - [~] 6.4 Implement workflow type selection
+  - [x] 6.4 Implement workflow type selection
     - Prompt user to choose requirements-first or design-first
     - Route to appropriate workflow controller method
     - _Requirements: 15.2_
   
-  - [~] 6.5 Implement spec name input
+  - [x] 6.5 Implement spec name input
     - Prompt user for spec name
     - Validate input format
     - Show error for invalid names
@@ -164,7 +164,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test workflow routing
     - _Requirements: 1.5, 1.4_
 
-- [ ] 7. Implement WorkflowController
+- [x] 7. Implement WorkflowController
   - [~] 7.1 Create WorkflowController class
     - Initialize with VSCode extension context
     - Set up Cline Controller integration
@@ -235,7 +235,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
 - [~] 8. Checkpoint - Ensure workflow controller tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Implement TaskExecutor
+- [~] 9. Implement TaskExecutor
   - [~] 9.1 Create TaskExecutor class
     - Initialize with Cline Controller
     - _Requirements: 10.1, 11.3_
@@ -268,7 +268,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test error handling
     - _Requirements: 10.1, 10.2, 10.3_
 
-- [ ] 10. Implement TaskOrchestrator
+- [~] 10. Implement TaskOrchestrator
   - [~] 10.1 Create TaskOrchestrator class
     - Initialize with spec directory and controller
     - Set up TasksParser and TaskExecutor
@@ -314,7 +314,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test error handling
     - _Requirements: 7.3, 8.2, 8.3_
 
-- [ ] 11. Implement PBT status tracking
+- [~] 11. Implement PBT status tracking
   - [~] 11.1 Add PBT status to Task interface
     - Extend Task with pbtStatus field
     - Define PBTStatus type
@@ -341,7 +341,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
 - [~] 12. Checkpoint - Ensure orchestration tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 13. Implement SpecPreviewProvider webview
+- [~] 13. Implement SpecPreviewProvider webview
   - [~] 13.1 Create SpecPreviewProvider class
     - Implement WebviewViewProvider interface
     - Initialize with extension context
@@ -383,7 +383,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test tab switching
     - _Requirements: 5.1, 5.3_
 
-- [ ] 14. Implement Tasks tab interactive actions
+- [~] 14. Implement Tasks tab interactive actions
   - [~] 14.1 Add Execute All Tasks button
     - Render button in tasks tab
     - Handle click event
@@ -414,7 +414,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test status updates
     - _Requirements: 6.1, 6.2, 6.6_
 
-- [ ] 15. Implement error handling
+- [~] 15. Implement error handling
   - [~] 15.1 Create FileSystemErrorHandler
     - Handle ENOENT, EACCES, ENOSPC errors
     - Show user-friendly error messages
@@ -462,7 +462,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test backup and restore
     - _Requirements: 17.1, 17.2, 17.3_
 
-- [ ] 16. Implement VSCode extension integration
+- [~] 16. Implement VSCode extension integration
   - [~] 16.1 Register commands in package.json
     - Add sddcline.createNewSpec command
     - Add sddcline.openSpecPreview command
@@ -502,7 +502,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test webview provider registration
     - _Requirements: 11.1, 18.1_
 
-- [ ] 17. Implement validation logic
+- [~] 17. Implement validation logic
   - [~] 17.1 Implement EARS pattern validation
     - Write validateEARSPattern() method
     - Check each criterion matches one EARS pattern
@@ -547,7 +547,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
 - [~] 18. Checkpoint - Ensure all validation tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 19. Integration and wiring
+- [~] 19. Integration and wiring
   - [~] 19.1 Wire SpecSystem to extension activation
     - Import SpecSystem in extension.ts
     - Initialize in activate() function
