@@ -37,13 +37,13 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - _Requirements: 16.1, 16.6_
 
 - [ ] 3. Implement RequirementsParser
-  - [-] 3.1 Implement requirements document parsing
+  - [x] 3.1 Implement requirements document parsing
     - Write parse() method to extract requirements from markdown
     - Parse requirement IDs, user stories, and acceptance criteria
     - Build Requirement objects with proper structure
     - _Requirements: 12.1, 13.1, 13.2_
   
-  - [~] 3.2 Implement EARS pattern detection
+  - [-] 3.2 Implement EARS pattern detection
     - Write detectEARSPattern() method
     - Identify WHEN/THEN for event-driven patterns
     - Identify WHILE for state-driven patterns
