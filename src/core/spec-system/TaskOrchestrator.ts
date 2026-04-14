@@ -17,6 +17,8 @@ import * as path from "path"
 import type { Controller } from "../controller"
 import { TaskExecutor } from "./TaskExecutor"
 import { TasksParser } from "./TasksParser"
+import { TaskExecutionErrorHandler } from "./TaskExecutionErrorHandler"
+import { FileSystemErrorHandler } from "./FileSystemErrorHandler"
 import type { Task, TaskExecution, TaskStatus } from "./types"
 
 /**
@@ -30,6 +32,9 @@ const EXECUTION_STATE_FILE = ".execution-state.json"
 export class TaskOrchestrator {
 	private tasksParser: TasksParser
 	private taskExecutor: TaskExecutor
+	private taskExecutionErrorHandler: TaskExecutionErrorHandler
+	private fileSystemErrorHandler: FileSystemErrorHandler
+	private parsingErrorHandler: ParsingErrorHandler
 	private currentExecution: TaskExecution | null = null
 	private tasksFilePath: string
 
@@ -39,6 +44,9 @@ export class TaskOrchestrator {
 	) {
 		this.tasksParser = new TasksParser()
 		this.taskExecutor = new TaskExecutor(controller)
+		this.taskExecutionErrorHandler = new TaskExecutionErrorHandler(specDir)
+		this.fileSystemErrorHandler = new FileSystemErrorHandler()
+		this.parsingErrorHandler = new ParsingErrorHandler()
 		this.tasksFilePath = path.join(specDir, "tasks.md")
 	}
 
@@ -48,42 +56,57 @@ export class TaskOrchestrator {
 	 * Requirements: 7.1, 7.2, 7.3
 	 */
 	async executeAllTasks(): Promise<void> {
-		// Parse tasks document
-		const taskTree = await this.tasksParser.parse(this.tasksFilePath)
-		const allTasks = taskTree.getAllTasks()
-
-		// Initialize execution state
-		this.currentExecution = {
-			startTime: Date.now(),
-			tasks: allTasks,
-			completed: [],
-			failed: [],
-		}
-
-		// Save initial execution state
-		await this.saveExecutionState()
-
 		try {
-			// Execute tasks in order
-			for (const task of allTasks) {
-				// Skip already completed tasks (for resume capability)
-				if (task.status === "completed") {
-					this.currentExecution.completed.push(task.id)
-					continue
-				}
+			// Parse tasks document
+			const taskTree = await this.tasksParser.parse(this.tasksFilePath)
+			const allTasks = taskTree.getAllTasks()
 
-				// Execute the task
-				await this.executeTask(task)
-
-				// Stop if task failed
-				if (task.status === "failed") {
-					break
-				}
+			// Initialize execution state
+			this.currentExecution = {
+				startTime: Date.now(),
+				tasks: allTasks,
+				completed: [],
+				failed: [],
 			}
-		} finally {
-			// Clear execution state on completion
-			await this.clearExecutionState()
+
+			// Save initial execution state
+			await this.saveExecutionState()
+
+			try {
+				// Execute tasks in order
+				for (const task of allTasks) {
+					// Skip already completed tasks (for resume capability)
+					if (task.status === "completed") {
+						this.currentExecution.completed.push(task.id)
+						continue
+					}
+
+					// Execute the task
+					await this.executeTask(task)
+
+					// Stop if task failed
+					if (task.status === "failed") {
+						break
+					}
+				}
+			} finally {
+				// Clear execution state on completion
+				await this.clearExecutionState()
+			}
+		} catch (error) {
+			// Handle parsing errors
+			if (this.isParsingError(error)) {
+				await this.parsingErrorHandler.handleParsingError(error as ParsingError)
+			}
+			throw error
 		}
+	}
+
+	/**
+	 * Check if error is a ParsingError
+	 */
+	private isParsingError(error: unknown): boolean {
+		return error !== null && typeof error === "object" && "line" in error && "file" in error
 	}
 
 	/**
@@ -98,6 +121,9 @@ export class TaskOrchestrator {
 
 			// Update status to in_progress (Requirement 8.2)
 			await this.updateTaskStatus(task.id, "in_progress")
+
+			// Show progress
+			await this.taskExecutionErrorHandler.showProgress(task, "Starting execution")
 
 			// If task has sub-tasks, execute them first (Requirement 7.3)
 			if (task.subTasks && task.subTasks.length > 0) {
@@ -119,6 +145,7 @@ export class TaskOrchestrator {
 			if (result.success) {
 				await this.updateTaskStatus(task.id, "completed")
 				this.currentExecution?.completed.push(task.id)
+				await this.taskExecutionErrorHandler.showSuccess(task)
 			} else {
 				await this.updateTaskStatus(task.id, "failed")
 				this.currentExecution?.failed.push({
@@ -141,11 +168,21 @@ export class TaskOrchestrator {
 				error: errorMessage,
 			})
 
-			// Save execution state on failure (Requirement 17.2)
-			await this.saveExecutionState()
+			// Handle error with user prompt (Requirement 17.2)
+			const action = await this.taskExecutionErrorHandler.handleTaskError(task, error, () =>
+				this.saveExecutionState(),
+			)
 
-			// Re-throw to stop execution chain (Requirement 7.7)
-			throw error
+			if (action === "retry") {
+				// Retry the task
+				return await this.executeTask(task)
+			} else if (action === "skip") {
+				// Skip this task and continue
+				return
+			} else {
+				// Abort execution chain (Requirement 7.7)
+				throw error
+			}
 		}
 	}
 
@@ -155,21 +192,31 @@ export class TaskOrchestrator {
 	 * Requirements: 7.5, 8.2, 8.3, 8.5, 8.6
 	 */
 	private async updateTaskStatus(taskId: string, status: TaskStatus): Promise<void> {
-		// Parse tasks document
-		const taskTree = await this.tasksParser.parse(this.tasksFilePath)
+		try {
+			// Parse tasks document
+			const taskTree = await this.tasksParser.parse(this.tasksFilePath)
 
-		// Find and update task
-		const task = taskTree.findTask(taskId)
-		if (task) {
-			task.status = status
+			// Find and update task
+			const task = taskTree.findTask(taskId)
+			if (task) {
+				task.status = status
+			}
+
+			// Pretty print back to file
+			const updatedContent = this.tasksParser.prettyPrint(taskTree)
+			await fs.promises.writeFile(this.tasksFilePath, updatedContent)
+
+			// Notify UI of status changes (Requirement 8.6)
+			this.notifyStatusChange(taskId, status)
+		} catch (error) {
+			// Handle parsing errors
+			if (this.isParsingError(error)) {
+				await this.parsingErrorHandler.handleParsingError(error as ParsingError)
+			} else {
+				await this.fileSystemErrorHandler.handleFileError(error, "updating task status")
+			}
+			throw error
 		}
-
-		// Pretty print back to file
-		const updatedContent = this.tasksParser.prettyPrint(taskTree)
-		await fs.promises.writeFile(this.tasksFilePath, updatedContent)
-
-		// Notify UI of status changes (Requirement 8.6)
-		this.notifyStatusChange(taskId, status)
 	}
 
 	/**
@@ -182,24 +229,34 @@ export class TaskOrchestrator {
 		pbtStatus: "passed" | "failed" | "not_run" | "unexpected_pass",
 		failingExample?: string,
 	): Promise<void> {
-		// Parse tasks document
-		const taskTree = await this.tasksParser.parse(this.tasksFilePath)
+		try {
+			// Parse tasks document
+			const taskTree = await this.tasksParser.parse(this.tasksFilePath)
 
-		// Find and update task
-		const task = taskTree.findTask(taskId)
-		if (task) {
-			task.pbtStatus = {
-				status: pbtStatus,
-				failingExample,
+			// Find and update task
+			const task = taskTree.findTask(taskId)
+			if (task) {
+				task.pbtStatus = {
+					status: pbtStatus,
+					failingExample,
+				}
 			}
+
+			// Pretty print back to file (will persist PBT status)
+			const updatedContent = this.tasksParser.prettyPrint(taskTree)
+			await fs.promises.writeFile(this.tasksFilePath, updatedContent)
+
+			// Notify UI of PBT status change
+			this.notifyPBTStatusChange(taskId, pbtStatus, failingExample)
+		} catch (error) {
+			// Handle parsing errors
+			if (this.isParsingError(error)) {
+				await this.parsingErrorHandler.handleParsingError(error as ParsingError)
+			} else {
+				await this.fileSystemErrorHandler.handleFileError(error, "updating PBT status")
+			}
+			throw error
 		}
-
-		// Pretty print back to file (will persist PBT status)
-		const updatedContent = this.tasksParser.prettyPrint(taskTree)
-		await fs.promises.writeFile(this.tasksFilePath, updatedContent)
-
-		// Notify UI of PBT status change
-		this.notifyPBTStatusChange(taskId, pbtStatus, failingExample)
 	}
 
 	/**
@@ -223,9 +280,14 @@ export class TaskOrchestrator {
 			return
 		}
 
-		const statePath = path.join(this.specDir, EXECUTION_STATE_FILE)
-		const stateData = JSON.stringify(this.currentExecution, null, 2)
-		await fs.promises.writeFile(statePath, stateData)
+		try {
+			const statePath = path.join(this.specDir, EXECUTION_STATE_FILE)
+			const stateData = JSON.stringify(this.currentExecution, null, 2)
+			await fs.promises.writeFile(statePath, stateData)
+		} catch (error) {
+			await this.fileSystemErrorHandler.handleFileError(error, "saving execution state")
+			// Don't throw - this is a non-critical operation
+		}
 	}
 
 	/**

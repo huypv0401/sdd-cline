@@ -24,6 +24,7 @@ export class WorkflowController {
 	private configManager: ConfigManager
 	private requirementsParser: RequirementsParser
 	private tasksParser: TasksParser
+	private fileSystemErrorHandler: FileSystemErrorHandler
 
 	constructor(
 		private context: vscode.ExtensionContext,
@@ -32,6 +33,7 @@ export class WorkflowController {
 		this.configManager = new ConfigManager()
 		this.requirementsParser = new RequirementsParser()
 		this.tasksParser = new TasksParser()
+		this.fileSystemErrorHandler = new FileSystemErrorHandler()
 	}
 
 	/**
@@ -145,8 +147,13 @@ export class WorkflowController {
 
 		const specDir = path.join(workspaceFolder.uri.fsPath, ".sddcline", specName)
 
-		// Create directory recursively
-		await fs.promises.mkdir(specDir, { recursive: true })
+		try {
+			// Create directory recursively
+			await fs.promises.mkdir(specDir, { recursive: true })
+		} catch (error) {
+			await this.fileSystemErrorHandler.handleFileError(error, "creating spec directory")
+			throw error
+		}
 
 		return specDir
 	}
@@ -189,7 +196,12 @@ export class WorkflowController {
 2. THE system SHALL [action] [condition]
 `
 
-		await fs.promises.writeFile(requirementsPath, placeholderContent, "utf-8")
+		try {
+			await fs.promises.writeFile(requirementsPath, placeholderContent, "utf-8")
+		} catch (error) {
+			await this.fileSystemErrorHandler.handleFileError(error, "writing requirements document")
+			throw error
+		}
 	}
 
 	/**
@@ -231,7 +243,12 @@ export class WorkflowController {
 [Testing approach and requirements]
 `
 
-		await fs.promises.writeFile(designPath, placeholderContent, "utf-8")
+		try {
+			await fs.promises.writeFile(designPath, placeholderContent, "utf-8")
+		} catch (error) {
+			await this.fileSystemErrorHandler.handleFileError(error, "writing design document")
+			throw error
+		}
 	}
 
 	/**
@@ -263,7 +280,12 @@ export class WorkflowController {
   - [ ] 3.2 Integration tests
 `
 
-		await fs.promises.writeFile(tasksPath, placeholderContent, "utf-8")
+		try {
+			await fs.promises.writeFile(tasksPath, placeholderContent, "utf-8")
+		} catch (error) {
+			await this.fileSystemErrorHandler.handleFileError(error, "writing tasks document")
+			throw error
+		}
 	}
 
 	/**

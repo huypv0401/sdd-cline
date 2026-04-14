@@ -6,7 +6,8 @@
  */
 
 import * as fs from "fs"
-import { ParsingError, Task, TaskStatus, TaskTree } from "./types"
+import { ParsingError, Task, TaskStatus, TaskTree, ValidationResult } from "./types"
+import { TasksFormatValidator } from "./TasksFormatValidator"
 
 export class TasksParser {
 	/**
@@ -188,5 +189,28 @@ export class TasksParser {
 			case TaskStatus.FAILED:
 				return "-"
 		}
+	}
+
+	/**
+	 * Validate tasks format
+	 *
+	 * @param taskTree - TaskTree to validate
+	 * @param filePath - Path to the tasks file (for error reporting)
+	 * @returns ValidationResult with any errors found
+	 */
+	validateTasksFormat(taskTree: TaskTree, filePath: string): ValidationResult {
+		const validator = new TasksFormatValidator()
+		return validator.validate(taskTree, filePath)
+	}
+
+	/**
+	 * Validate tasks format (alias for validateTasksFormat)
+	 *
+	 * @param taskTree - TaskTree to validate
+	 * @param filePath - Path to the tasks file (for error reporting)
+	 * @returns ValidationResult with any errors found
+	 */
+	validate(taskTree: TaskTree, filePath: string): ValidationResult {
+		return this.validateTasksFormat(taskTree, filePath)
 	}
 }

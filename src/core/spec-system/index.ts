@@ -29,6 +29,10 @@ export { ValidationErrorHandler } from "./ValidationErrorHandler"
 export { BackupManager } from "./BackupManager"
 export { StatePersistence } from "./StatePersistence"
 export { ErrorLogger } from "./ErrorLogger"
+// Export validators
+export { EARSPatternValidator } from "./EARSPatternValidator"
+export { INCOSERulesValidator } from "./INCOSERulesValidator"
+export { TasksFormatValidator } from "./TasksFormatValidator"
 // Export all core types
 export * from "./types"
 

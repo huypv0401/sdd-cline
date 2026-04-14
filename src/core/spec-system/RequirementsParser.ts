@@ -5,7 +5,9 @@
  * building structured Requirement objects with IDs, user stories, and acceptance criteria.
  */
 
-import { AcceptanceCriterion, EARSPattern, Requirement } from "./types"
+import { AcceptanceCriterion, EARSPattern, Requirement, ValidationResult } from "./types"
+import { EARSPatternValidator } from "./EARSPatternValidator"
+import { INCOSERulesValidator } from "./INCOSERulesValidator"
 
 export class RequirementsParser {
 	/**
@@ -147,5 +149,46 @@ export class RequirementsParser {
 
 		// Complex: Requirements that don't fit standard EARS patterns
 		return EARSPattern.COMPLEX
+	}
+
+	/**
+	 * Validate requirements against EARS patterns
+	 *
+	 * @param requirements - Array of requirements to validate
+	 * @param filePath - Path to the requirements file (for error reporting)
+	 * @returns ValidationResult with any errors found
+	 */
+	validateEARSPattern(requirements: Requirement[], filePath: string): ValidationResult {
+		const validator = new EARSPatternValidator()
+		return validator.validate(requirements, filePath)
+	}
+
+	/**
+	 * Validate requirements against INCOSE rules
+	 *
+	 * @param requirements - Array of requirements to validate
+	 * @param filePath - Path to the requirements file (for error reporting)
+	 * @returns ValidationResult with any errors found
+	 */
+	validateINCOSERules(requirements: Requirement[], filePath: string): ValidationResult {
+		const validator = new INCOSERulesValidator()
+		return validator.validate(requirements, filePath)
+	}
+
+	/**
+	 * Validate requirements against both EARS patterns and INCOSE rules
+	 *
+	 * @param requirements - Array of requirements to validate
+	 * @param filePath - Path to the requirements file (for error reporting)
+	 * @returns Combined ValidationResult with all errors found
+	 */
+	validate(requirements: Requirement[], filePath: string): ValidationResult {
+		const earsResult = this.validateEARSPattern(requirements, filePath)
+		const incoseResult = this.validateINCOSERules(requirements, filePath)
+
+		return {
+			valid: earsResult.valid && incoseResult.valid,
+			errors: [...earsResult.errors, ...incoseResult.errors],
+		}
 	}
 }

@@ -502,18 +502,18 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test webview provider registration
     - _Requirements: 11.1, 18.1_
 
-- [~] 17. Implement validation logic
-  - [~] 17.1 Implement EARS pattern validation
+- [x] 17. Implement validation logic
+  - [x] 17.1 Implement EARS pattern validation
     - Write validateEARSPattern() method
     - Check each criterion matches one EARS pattern
     - _Requirements: 2.7, 12.4_
   
-  - [~] 17.2 Implement INCOSE rules validation
+  - [x] 17.2 Implement INCOSE rules validation
     - Write validateINCOSERules() method
     - Check clarity, testability, completeness
     - _Requirements: 2.8, 12.4_
   
-  - [~] 17.3 Implement tasks format validation
+  - [x] 17.3 Implement tasks format validation
     - Write validateTasksFormat() method
     - Check task ID format (numeric with dots)
     - Check status markers validity
@@ -544,38 +544,38 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test tasks format validation
     - _Requirements: 2.7, 2.8, 12.4, 12.5_
 
-- [~] 18. Checkpoint - Ensure all validation tests pass
+- [x] 18. Checkpoint - Ensure all validation tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 19. Integration and wiring
-  - [~] 19.1 Wire SpecSystem to extension activation
+- [x] 19. Integration and wiring
+  - [x] 19.1 Wire SpecSystem to extension activation
     - Import SpecSystem in extension.ts
     - Initialize in activate() function
     - Register all commands and providers
     - _Requirements: 11.1_
   
-  - [~] 19.2 Wire WorkflowController to SpecSystem
+  - [x] 19.2 Wire WorkflowController to SpecSystem
     - Connect createNewSpec() to WorkflowController
     - Pass extension context
     - _Requirements: 2.1, 3.1_
   
-  - [~] 19.3 Wire TaskOrchestrator to SpecPreviewProvider
+  - [x] 19.3 Wire TaskOrchestrator to SpecPreviewProvider
     - Connect execute buttons to TaskOrchestrator
     - Set up status update callbacks
     - _Requirements: 6.3, 6.4, 6.6_
   
-  - [~] 19.4 Wire parsers to all components
+  - [x] 19.4 Wire parsers to all components
     - Inject RequirementsParser into WorkflowController
     - Inject TasksParser into TaskOrchestrator
     - _Requirements: 12.1, 12.2, 12.3_
   
-  - [~] 19.5 Wire error handlers to all components
+  - [x] 19.5 Wire error handlers to all components
     - Add error handling to file operations
     - Add error handling to parsing operations
     - Add error handling to task execution
     - _Requirements: 17.1, 17.2, 17.4_
   
-  - [~] 19.6 Set up file watchers
+  - [x] 19.6 Set up file watchers
     - Watch spec files for changes
     - Trigger preview refresh on changes
     - _Requirements: 5.7_
@@ -586,7 +586,7 @@ This implementation plan breaks down the Spec Workflow feature into discrete, ac
     - Test task execution flow
     - _Requirements: 2.1, 3.1, 7.1_
 
-- [~] 20. Final checkpoint - Ensure all tests pass
+- [ ] 20. Final checkpoint - Ensure all tests pass
   - Run all unit tests, property tests, and integration tests
   - Verify no regressions
   - Ensure all tests pass, ask the user if questions arise.

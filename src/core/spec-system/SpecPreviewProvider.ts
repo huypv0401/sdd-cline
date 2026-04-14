@@ -31,11 +31,14 @@ export class SpecPreviewProvider implements vscode.WebviewViewProvider {
 	private scrollPositions: Map<string, number> = new Map()
 	private fileWatchers: vscode.FileSystemWatcher[] = []
 	private disposables: vscode.Disposable[] = []
+	private fileSystemErrorHandler: FileSystemErrorHandler
 
 	constructor(
 		private readonly context: vscode.ExtensionContext,
 		private readonly controller: Controller,
-	) {}
+	) {
+		this.fileSystemErrorHandler = new FileSystemErrorHandler()
+	}
 
 	/**
 	 * Resolve webview view when it's first created
@@ -139,6 +142,7 @@ export class SpecPreviewProvider implements vscode.WebviewViewProvider {
 		try {
 			return await fs.promises.readFile(filePath, "utf-8")
 		} catch (error) {
+			await this.fileSystemErrorHandler.handleFileError(error, `reading ${path.basename(filePath)}`)
 			return `# Error\n\nFailed to load file: ${path.basename(filePath)}`
 		}
 	}
